@@ -1,5 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:todo/Auth/authscreen.dart';
+import 'package:todo/screens/Home.dart';
 
 import 'firebase_options.dart';
 
@@ -17,10 +19,12 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      home: AuthScreen(),
       debugShowCheckedModeBanner: false,
       theme:
       ThemeData(brightness: Brightness.dark,
-          primaryColor:Colors.indigoAccent ),
+          primaryColor:Colors.indigoAccent
+      ),
 
     );
   }
