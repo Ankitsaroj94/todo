@@ -114,10 +114,71 @@ class _AuthFormState extends State<AuthForm> {
                           labelText: "Enter Password",
                           labelStyle: GoogleFonts.roboto()
                       ),
+
                     ),
-                  ],),
-            ))
-        ],)
+                    SizedBox(height: 10),
+                    SizedBox(
+
+                      height: 70,
+                      width: 150,
+                       child: ElevatedButton(
+
+                         onPressed: () { },
+
+                         style: ElevatedButton.styleFrom(
+                           textStyle: TextStyle(fontSize: 25),
+                            foregroundColor: Colors.amberAccent,
+                            backgroundColor: Colors.blue,
+                            minimumSize: Size(88, 36),
+                            padding: EdgeInsets.symmetric(horizontal: 16),
+                            shape: const RoundedRectangleBorder(
+                              borderRadius: BorderRadius.all(Radius.circular(10)),
+                            ),
+
+                          ),
+                         child: isLoginPage? Text('Login')
+                             :Text('Sign Up'),
+
+                        )
+                    ),
+
+                    SizedBox(height: 10),
+                 /* SizedBox(
+                      height: 60,
+                      width: 150,
+                      child: ElevatedButton(onPressed: () { },
+
+                        style: ElevatedButton.styleFrom(
+                          textStyle: TextStyle(fontSize: 25),
+
+                          backgroundColor: Colors.blue,
+                          minimumSize: Size(88, 36),
+                          padding: EdgeInsets.symmetric(horizontal: 16),
+                          shape: const RoundedRectangleBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(10)),
+                          ),
+
+                        ),
+                        child: isLoginPage? Text('Login')
+                            :Text('Sign Up'),
+                      ),
+                    ) */
+
+                    TextButton(
+                      style: TextButton.styleFrom(
+                        textStyle: const TextStyle(fontSize: 20),
+                      ),
+                      onPressed: () {},
+                      child: const Text('Enabled'),
+                    ),
+                  ],
+                ),
+
+            )
+          )
+
+        ],
+      )
     );
   }
 }
