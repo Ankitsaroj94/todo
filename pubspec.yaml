@@ -32,6 +32,9 @@ dependencies:
     sdk: flutter
   firebase_auth:
   google_fonts:
+  intl:
+  # add this line to your dependencies
+  fluttertoast: ^8.2.2
 
 
   # The following adds the Cupertino Icons font to your application.
