@@ -12,6 +12,7 @@ class AuthForm extends StatefulWidget {
   @override
   State<AuthForm> createState() => _AuthFormState();
 }
+final GlobalKey<ScaffoldMessengerState> _scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 
 class _AuthFormState extends State<AuthForm> {
   //---------------------------------------------
@@ -21,49 +22,75 @@ class _AuthFormState extends State<AuthForm> {
   var _password='';
   var _username='';
   bool isLoginPage=false;
+  bool isLoading = false;
+
 
   //-----------------------------------------------
-
-  startauthentication()  {
-   bool validity = _formkey.currentState?.validate() ??false;
+  startauthentication() async {
+    bool validity = _formkey.currentState?.validate() ?? false;
     FocusScope.of(context).unfocus();
 
     if (validity) {
       _formkey.currentState?.save();
-      submitform(_email,_password,_username);
+
+      setState(() {
+        isLoading = true;
+      });
+
+      await Future.delayed(Duration(seconds: 3));  // 3-second delay
+
+      await submitform(_email, _password, _username);
+
+      setState(() {
+        isLoading = false;
+      });
     }
   }
+
 
   submitform(String email, String password, String username) async {
     final auth = FirebaseAuth.instance;
     UserCredential authResult;
     try {
       if (isLoginPage) {
-        authResult = await auth.signInWithEmailAndPassword(email: email, password: password);
+        authResult = await auth
+            .signInWithEmailAndPassword(email: email, password: password);
       } else {
-        authResult = await auth.createUserWithEmailAndPassword(email: email, password: password);
+        authResult = await auth
+            .createUserWithEmailAndPassword(email: email, password: password);
         String? uid = authResult.user?.uid;
 
         if (uid != null) { // Check if uid is not null
-          await FirebaseFirestore.instance.collection('users').doc(uid).set({
+          await FirebaseFirestore
+              .instance.collection('users')
+              .doc(uid).set({
             'username': username,
             'email': email,
           });
         } else {
           // Handle the case when uid is null (this should ideally never happen if createUserWithEmailAndPassword was successful)
-          print("Error: UID is null");
+          _scaffoldMessengerKey.currentState?.showSnackBar(
+              SnackBar(content: Text('Unexpected error occurred. Please try again.'))
+          );
+
           // You can also show a message to the user or log this incident for debugging.
         }
       }
     } catch (err) {
-      print(err);
+      _scaffoldMessengerKey.currentState?.showSnackBar(
+          SnackBar(content: Text('Unexpected error occurred. Please try again.'))
+      );
+
     }
   }
 
   //-----------------------------------------------
    @override
   Widget build(BuildContext context) {
-    return Container(
+    return
+      ScaffoldMessenger(
+        key: _scaffoldMessengerKey,
+        child: SizedBox(
       //------- to set height and width----
 
       height: MediaQuery.of(context).size.height,
@@ -165,27 +192,33 @@ class _AuthFormState extends State<AuthForm> {
 
                       height: 70,
                       width: 150,
-                       child: ElevatedButton(
+                       child: Stack(
+                         alignment: Alignment.center,
+                         children: [
+                           SizedBox(
+                             height: 70,
+                             width: 150,
+                             child: ElevatedButton(
+                               onPressed: () {
+                                 startauthentication();
+                               },
+                               style: ElevatedButton.styleFrom(
+                                 textStyle: TextStyle(fontSize: 25),
+                                 foregroundColor: Colors.amberAccent,
+                                 backgroundColor: Colors.blue,
+                                 minimumSize: Size(88, 36),
+                                 padding: EdgeInsets.symmetric(horizontal: 16),
+                                 shape: const RoundedRectangleBorder(
+                                   borderRadius: BorderRadius.all(Radius.circular(10)),
+                                 ),
+                               ),
+                               child: isLoginPage ? Text('Login') : Text('Sign Up'),
+                             ),
+                           ),
+                           if (isLoading) CircularProgressIndicator(backgroundColor: Colors.white)
+                         ],
+                       ),
 
-                         onPressed: () {
-                           startauthentication();
-                         },
-
-                         style: ElevatedButton.styleFrom(
-                           textStyle: TextStyle(fontSize: 25),
-                            foregroundColor: Colors.amberAccent,
-                            backgroundColor: Colors.blue,
-                            minimumSize: Size(88, 36),
-                            padding: EdgeInsets.symmetric(horizontal: 16),
-                            shape: const RoundedRectangleBorder(
-                              borderRadius: BorderRadius.all(Radius.circular(10)),
-                            ),
-
-                          ),
-                         child: isLoginPage? Text('Login')
-                             :Text('Sign Up'),
-
-                        )
                     ),
 
                     SizedBox(height: 10),
@@ -208,6 +241,6 @@ class _AuthFormState extends State<AuthForm> {
 
         ],
       )
-    );
+    ),);
   }
 }
